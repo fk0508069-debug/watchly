@@ -8,13 +8,13 @@ export async function POST() {
     );
 
     // This clears the "token" cookie
-    response.cookies.set("token", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict", 
-      expires: new Date(0), // Set expiration to the past to delete it
-      path: "/",
-    });
+     response.cookies.set("token", "", {
+    httpOnly: true,
+    secure: false, // must match login EXACTLY
+    sameSite: "lax",
+    path: "/",
+    expires: new Date(0),
+  });
 
     return response;
   } catch (error) {

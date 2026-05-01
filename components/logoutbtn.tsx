@@ -12,6 +12,7 @@ export default function LogoutButton() {
     try {
       const res = await fetch("/api/auth/logout", {
         method: "POST",
+        credentials: "include" // Include cookies for authentication
       });
 
       if (res.ok) {

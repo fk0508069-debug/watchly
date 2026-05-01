@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { signIn } from "next-auth/react"
+import Link from "next/link";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +22,7 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
+         credentials: "include", // <<< ADD THIS
       });
 
       const data = await res.json();
@@ -39,11 +41,15 @@ export default function LoginPage() {
     }
   };
 
+  // const handleGoogleLogin = () => {
+  //   signIn('google');
+  // };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-xl">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md p-6 sm:p-8 space-y-4 sm:space-y-6 bg-white rounded-2xl shadow-xl">
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">Sign In</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">Sign In</h2>
           <p className="mt-2 text-sm text-gray-600">Access your account</p>
         </div>
 
@@ -59,7 +65,7 @@ export default function LoginPage() {
             type="email"
             placeholder="Email address"
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm sm:text-base"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -68,7 +74,7 @@ export default function LoginPage() {
             type="password"
             placeholder="Password"
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm sm:text-base"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -76,7 +82,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 font-bold text-white rounded-lg transition-colors ${
+            className={`w-full py-3 font-bold text-white rounded-lg transition-colors text-sm sm:text-base ${
               loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
@@ -84,8 +90,16 @@ export default function LoginPage() {
           </button>
         </form>
 
+        <div className="flex items-center gap-2">
+          <span className="h-px flex-1 bg-gray-200" />
+          <span className="text-xs uppercase tracking-[0.3em] text-gray-400">or</span>
+          <span className="h-px flex-1 bg-gray-200" />
+        </div>
+
+      
+
         <p className="text-sm text-center text-gray-500">
-          New here? <a href="/signup" className="text-blue-600 hover:underline">Create an account</a>
+          New here? <Link href="/signup" className="text-blue-600 hover:underline">Create an account</Link>
         </p>
       </div>
     </div>

@@ -87,7 +87,7 @@ export default function ProductDetail() {
                 Go to Login
               </Link>
               <Link 
-                href="/"
+                href="/home"
                 className="border-2 border-gray-300 text-gray-900 px-8 py-3 rounded-lg font-bold hover:border-gray-400 transition"
               >
                 Back to Store
@@ -117,7 +117,7 @@ export default function ProductDetail() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Product not found</h2>
             <p className="text-gray-600 mb-6">{error || 'The product you are looking for does not exist.'}</p>
             <Link 
-              href="/"
+              href="/home"
               className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
             >
               Back to Store
@@ -132,51 +132,55 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Store</h1>
-          <Link href="/" className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex justify-between items-center">
+           <div className="flex-shrink-0 flex items-center">
+        <Link href="/home" className="text-xl sm:text-2xl font-extrabold tracking-tight cursor-pointer">
+          <span className="text-black">watch</span><span className="text-yellow-400">ly</span>
+        </Link>
+      </div>
+          <Link href="/home" className="px-3 sm:px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition text-sm sm:text-base">
             ← Back to Products
           </Link>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Product Detail */}
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Product Image */}
-          <div className="flex items-center justify-center bg-white rounded-lg border border-gray-200 p-8 min-h-[500px]">
-            <img 
-              src={product.image} 
+          <div className="flex items-center justify-center bg-white rounded-lg border border-gray-200 p-4 sm:p-8 min-h-[300px] sm:min-h-[500px]">
+            <img
+              src={product.image}
               alt={product.name}
               className="w-full h-full object-cover rounded-lg"
             />
           </div>
 
           {/* Product Information */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Category */}
-            <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">
+            <p className="text-xs sm:text-sm text-gray-500 uppercase tracking-wider font-semibold">
               {product.category}
             </p>
 
             {/* Name */}
-            <h1 className="text-4xl font-bold text-gray-900">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
               {product.name}
             </h1>
 
             {/* Price */}
             <div className="space-y-2">
-              <p className="text-gray-600">Price</p>
-              <p className="text-5xl font-bold text-gray-900">
-                ${product.price}
+              <p className="text-sm sm:text-base text-gray-600">Price</p>
+              <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900">
+                RS  {product.price}\-
               </p>
             </div>
 
             {/* Description */}
             {product.description && (
-              <div className="space-y-2 py-6 border-y border-gray-200">
-                <p className="text-gray-600">Description</p>
-                <p className="text-gray-900 leading-relaxed">
+              <div className="space-y-2 py-4 sm:py-6 border-y border-gray-200">
+                <p className="text-sm sm:text-base text-gray-600">Description</p>
+                <p className="text-sm sm:text-base text-gray-900 leading-relaxed">
                   {product.description}
                 </p>
               </div>
@@ -184,23 +188,23 @@ export default function ProductDetail() {
 
             {/* Stock Status */}
             <div className="space-y-2">
-              <p className="text-gray-600">Availability</p>
-              <p className="text-lg font-semibold text-green-600">
+              <p className="text-sm sm:text-base text-gray-600">Availability</p>
+              <p className="text-base sm:text-lg font-semibold text-green-600">
                 In Stock
               </p>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex gap-4 pt-6">
-              <Link 
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6">
+              <Link
                 href={`/checkout/${product._id}`}
-                className="flex-1 bg-black text-white py-4 rounded-lg font-bold text-lg hover:bg-gray-800 transition text-center"
+                className="flex-1 bg-black text-white py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:bg-gray-800 transition text-center"
               >
                 Buy Now
               </Link>
-              <Link 
-                href="/"
-                className="flex-1 border-2 border-gray-300 text-gray-900 py-4 rounded-lg font-bold text-lg hover:border-gray-400 transition text-center"
+              <Link
+                href="/home"
+                className="flex-1 border-2 border-gray-300 text-gray-900 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:border-gray-400 transition text-center"
               >
                 Continue Shopping
               </Link>
@@ -209,10 +213,10 @@ export default function ProductDetail() {
             {/* Additional Info */}
             {product.createdAt && (
               <p className="text-xs text-gray-500">
-                Added on {new Date(product.createdAt).toLocaleDateString(undefined, { 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
+                Added on {new Date(product.createdAt).toLocaleDateString(undefined, {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
                 })}
               </p>
             )}

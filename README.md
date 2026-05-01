@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment Variables
+
+Create a `.env` file in the root directory and add the following variables:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/check
+JWT_SECRET=your_jwt_secret_key_change_this_to_a_secure_random_string
+```
+
 ## Getting Started
 
 First, run the development server:

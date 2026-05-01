@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard"; 
+import CartSidebar from "@/components/CartSidebar";
 import Link from "next/link";
 export default function Home() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function Home() {
   const [cardsLoading, setCardsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -78,36 +80,37 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar onCartOpen={() => {}} />
+  
+      <Navbar onCartOpen={() => setCartOpen(true)} />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <CartSidebar open={cartOpen} onClose={() => setCartOpen(false)} />
+
+      <main className="max-w-7xl m-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         {/* Header Section */}
-        <h1 className="m-10 p-5 text-4xl font-bold uppercase tracking-wide">
-          Featured Product
-        </h1>
 
-        {/* Search Bar */}
-        <div className="mb-8 space-y-4">
+<h1>.</h1>        
+<h1>.</h1>        
+        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
           <div className="relative">
             <input
               type="text"
               placeholder="Search by product name or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900"
+              className="w-full px-4 py-3 pl-10 sm:pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-gray-900 text-sm sm:text-base"
             />
-            <svg className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 sm:left-4 top-3.5 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
 
           {/* Category Filter */}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 overflow-x-auto pb-2">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full font-medium transition-all ${
+                className={`px-3 sm:px-4 py-2 rounded-full font-medium transition-all whitespace-nowrap text-xs sm:text-sm ${
                   selectedCategory === category
                     ? 'bg-black text-white'
                     : 'bg-gray-200 text-gray-900 hover:bg-gray-300'
@@ -121,34 +124,38 @@ export default function Home() {
 
         {/* Loading State */}
         {cardsLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <p className="text-gray-600">Loading products...</p>
+          <div className="flex justify-center items-center py-8 sm:py-12">
+            <p className="text-gray-600 text-sm sm:text-base">Loading products...</p>
           </div>
         ) : filteredCards.length === 0 ? (
-          <div className="flex justify-center items-center py-12">
-            <p className="text-gray-600">
-              {cards.length === 0 
-                ? 'No products available yet.' 
+          <div className="flex justify-center items-center py-8 sm:py-12">
+            <p className="text-gray-600 text-sm sm:text-base">
+              {cards.length === 0
+                ? 'No products available yet.'
                 : `No products found matching "${searchQuery}". Try a different search.`}
             </p>
           </div>
         ) : (
           /* Responsive Grid Layout */
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="text-xs sm:text-sm text-gray-600">
               Showing {filteredCards.length} of {cards.length} products
             </p>
-            <div className="grid grid-rows-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {filteredCards.map((card) => (
-                <ProductCard   
-                  key={card._id} 
+                <ProductCard
+                  key={card._id}
                   id={card._id}
                   name={card.name}
                   price={card.price}
                   category={card.category}
                   image={card.image}
                 />
+
+
               ))}
+
+
             </div>
           </div>
         )}

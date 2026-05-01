@@ -16,6 +16,9 @@ export default function AddCard() {
     image: '',
     description: '',
   });
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -52,18 +55,81 @@ export default function AddCard() {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+      // Clear the image URL field when file is selected
+      setFormData(prev => ({
+        ...prev,
+        image: ''
+      }));
+    }
+  };
+
+  const uploadImage = async (file) => {
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+
+      const data = await response.json();
+      return data.imageUrl;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setMessage('');
 
     try {
+      let imageUrl = formData.image;
+
+      // If a file is selected, upload it first
+      if (selectedFile) {
+        setUploading(true);
+        try {
+          imageUrl = await uploadImage(selectedFile);
+          setUploading(false);
+        } catch (uploadError) {
+          setUploading(false);
+          setMessage('Error uploading image. Please try again.');
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      // Validate that we have an image URL
+      if (!imageUrl) {
+        setMessage('Error: Please provide an image URL or upload an image file.');
+        setSubmitting(false);
+        return;
+      }
+
       const res = await fetch('/api/cards/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          image: imageUrl,
+        }),
       });
 
       const data = await res.json();
@@ -81,6 +147,8 @@ export default function AddCard() {
         image: '',
         description: '',
       });
+      setSelectedFile(null);
+      setImagePreview('');
 
       // Redirect to home after 2 seconds
       setTimeout(() => {
@@ -90,6 +158,7 @@ export default function AddCard() {
       setMessage(`Error: ${error.message}`);
     } finally {
       setSubmitting(false);
+      setUploading(false);
     }
   };
 
@@ -122,18 +191,18 @@ export default function AddCard() {
     <div className="min-h-screen bg-gray-50">
       <Navbar onCartOpen={() => {}} />
       
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Add New Card</h1>
-          <p className="text-gray-600 mb-6">Admin only - Add products to the store</p>
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Add New Card</h1>
+          <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Admin only - Add products to the store</p>
 
           {message && (
-            <div className={`mb-4 p-4 rounded-lg ${message.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            <div className={`mb-4 p-3 sm:p-4 rounded-lg text-sm sm:text-base ${message.includes('Error') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
               {message}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Name */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -146,7 +215,7 @@ export default function AddCard() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                 placeholder="e.g., Classic Sneakers"
               />
             </div>
@@ -154,7 +223,7 @@ export default function AddCard() {
             {/* Price */}
             <div>
               <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                Price ($) *
+                Price (Rs) *
               </label>
               <input
                 type="number"
@@ -165,13 +234,13 @@ export default function AddCard() {
                 required
                 min="0"
                 step="0.01"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., 89.99"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
+                placeholder="e.g., 89.99 Rs"
               />
             </div>
 
             {/* Category */}
-            <div>
+            {/* <div>
               <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                 Category *
               </label>
@@ -185,23 +254,82 @@ export default function AddCard() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., Shoes"
               />
-            </div>
-
-            {/* Image URL */}
+            </div> */}
             <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                Image URL *
+  <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+    Category *
+  </label>
+  <select
+    id="category"
+    name="category"
+    value={formData.category}
+    onChange={handleChange}
+    required
+    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 cursor-pointer text-sm sm:text-base"
+  >
+    <option value="" disabled>Select a category</option>
+    <option value="Electronics">GENERAL</option>
+    <option value="Clothing">Clothing</option>
+    <option value="Footwear">WATCHES</option>
+    <option value="Accessories">Accessories</option>
+    <option value="Appliances">FOOT WEAR</option>
+  </select>
+</div>
+
+            {/* Image Upload/URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Image *
               </label>
-              <input
-                type="url"
-                id="image"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., https://via.placeholder.com/300"
-              />
+              
+              {/* File Upload */}
+              <div className="mb-4">
+                <label className="block text-sm text-gray-600 mb-2">Upload Image File</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                {uploading && (
+                  <p className="text-sm text-blue-600 mt-1">Uploading image...</p>
+                )}
+              </div>
+
+              {/* OR separator */}
+              <div className="flex items-center my-4">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <span className="px-3 bg-white text-sm text-gray-500">OR</span>
+                <div className="flex-1 border-t border-gray-300"></div>
+              </div>
+
+              {/* Image URL */}
+              <div>
+                <label htmlFor="image" className="block text-sm text-gray-600 mb-2">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  id="image"
+                  name="image"
+                  value={formData.image}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="e.g., https://via.placeholder.com/300"
+                />
+              </div>
+
+              {/* Image Preview */}
+              {(imagePreview || formData.image) && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
+                  <img
+                    src={imagePreview || formData.image}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Description */}
@@ -223,10 +351,10 @@ export default function AddCard() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || uploading}
               className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
             >
-              {submitting ? 'Adding Card...' : 'Add Card'}
+              {uploading ? 'Uploading Image...' : submitting ? 'Adding Card...' : 'Add Card'}
             </button>
           </form>
         </div>

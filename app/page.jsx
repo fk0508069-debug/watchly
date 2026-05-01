@@ -26,6 +26,8 @@ export default function Home() {
     fetchCards();
   }, []);
 
+  
+
   // Filter cards based on search
   const filteredCards = cards.filter((card) => {
     const matchesSearch = card.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -36,18 +38,42 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Store</h1>
-          <Link href="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
-            Login
-          </Link>
-        </div>
-      </header>
+   <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm sticky top-0 z-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between items-center h-16">
+      {/* Logo Section */}
+      <div className="flex-shrink-0 flex items-center">
+        <h1 className="text-2xl font-extrabold tracking-tight cursor-default">
+          <span className="text-black">watch</span><span className="text-yellow-400">ly</span>
+        </h1>
+      </div>
+
+      {/* Navigation Links */}
+      <nav className="hidden md:flex space-x-8 items-center">
+        <Link 
+          href="/home" 
+           className="px-4 py-2 rounded-lg bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition-all shadow-md shadow-indigo-100"
+        >
+          Home
+        </Link>
+        
+      </nav>
+
+      {/* Mobile Menu Button (Optional placeholder) */}
+      <div className="md:hidden flex items-center">
+        <button className="text-gray-500 hover:text-gray-600">
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Title */}
-        <h2 className="text-4xl font-bold mb-8 text-gray-900">Products</h2>
+       
 
         {/* Search Bar */}
         <div className="mb-8">
@@ -105,7 +131,7 @@ export default function Home() {
                         {card.name}
                       </h3>
                       <p className="text-2xl font-bold text-gray-900">
-                        ${card.price}
+                        Rs {card.price}
                       </p>
                     </div>
                   </div>

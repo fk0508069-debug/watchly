@@ -4,10 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
-
 import LogoutButton from "@/components/logoutbtn";
+
 interface User {
- 
   name: string;
   email: string;
   role: string;
@@ -18,105 +17,102 @@ export default function Profile() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await fetch('/api/user/me');
-        if (!res.ok) {
-          if (res.status === 401) {
-            // Not authenticated, redirect to login
-            router.push('/login');
-            return;
-          }
-          throw new Error('Failed to fetch user data');
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else if (res.status === 401) {
+          router.push('/login');
         }
-        const data = await res.json();
-        setUser(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchUser();
   }, [router]);
 
-  
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white text-black font-sans">
       <Navbar onCartOpen={() => {}} />
-      <main className="max-w-2xl mx-auto px-4 py-20 mt-16">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Profile</h1>
+      
+      <main className="max-w-3xl mx-auto px-6 py-24">
+        <h1 className="text-3xl font-bold mb-8 uppercase tracking-tight">Profile</h1>
 
-        {loading && (
-          <div className="text-center text-gray-600">Loading profile...</div>
-        )}
+        {loading ? (
+          <div className="text-sm font-medium text-gray-400 uppercase tracking-widest">Loading...</div>
+        ) : user && (
+          <div className="space-y-8">
+            {/* Responsive Table/List */}
+            <div className="border-t-2 border-black">
+              {/* Desktop Table */}
+              <div className="hidden md:block">
+                <table className="w-full text-left">
+                  <tbody>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-5 font-bold uppercase text-xs text-gray-400 w-1/3 text-left">Name</td>
+                      <td className="py-5 text-lg font-medium text-right">{user.name}</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-5 font-bold uppercase text-xs text-gray-400 text-left">Email</td>
+                      <td className="py-5 text-lg font-medium text-right lowercase">{user.email}</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-5 font-bold uppercase text-xs text-gray-400 text-left">Role</td>
+                      <td className="py-5 text-lg font-medium text-right uppercase tracking-tight">{user.role}</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-5 font-bold uppercase text-xs text-gray-400 text-left">Joined</td>
+                      <td className="py-5 text-lg font-medium text-right italic text-gray-600">
+                        {new Date(user.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
-        )}
-
-       {user?.role === 'admin' && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h2 className="text-sm font-semibold text-blue-800 mb-3">Admin Dashboard</h2>
-            <Link
-              href="/dashboard"
-              className="inline-block bg-blue-600 text-white px-5 py-2.5 rounded-md font-medium hover:bg-blue-700 transition-all shadow-sm"
-            >
-              ＋ dashboard
-            </Link>
-          </div>
-        )}
-
-        {user && (
-          <div className="bg-white shadow-lg rounded-lg p-8">
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Name
-              </label>
-              <p className="text-lg text-gray-900 bg-gray-50 p-3 rounded">{user.name}</p>
+              {/* Mobile List */}
+              <div className="md:hidden space-y-4">
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="font-bold uppercase text-xs text-gray-400">Name</span>
+                  <span className="text-lg font-medium">{user.name}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="font-bold uppercase text-xs text-gray-400">Email</span>
+                  <span className="text-lg font-medium lowercase">{user.email}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="font-bold uppercase text-xs text-gray-400">Role</span>
+                  <span className="text-lg font-medium uppercase tracking-tight">{user.role}</span>
+                </div>
+                <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                  <span className="font-bold uppercase text-xs text-gray-400">Joined</span>
+                  <span className="text-lg font-medium italic text-gray-600">
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
             </div>
 
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <p className="text-lg text-gray-900 bg-gray-50 p-3 rounded">{user.email}</p>
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Role
-                  </label>
-                  <p className="text-lg text-gray-900 bg-gray-50 p-3 rounded">{user.role}</p>
-                </div>
-
-
-
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Member Since
-              </label>
-              <p className="text-lg text-gray-900 bg-gray-50 p-3 rounded">
-                {new Date(user.createdAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </p>
+            {/* Simple Yellow Button Area */}
+            <div className="pt-6 flex flex-col items-center gap-6">
+              <div className="w-full sm:w-64 [&>button]:w-full [&>button]:bg-yellow-400 [&>button]:text-black [&>button]:py-4 [&>button]:font-bold [&>button]:uppercase [&>button]:tracking-widest [&>button]:hover:bg-black [&>button]:hover:text-white [&>button]:transition-all [&>button]:duration-200">
                 <LogoutButton />
+              </div>
+              
+              {user.role === 'admin' && (
+                <Link href="/dashboard" className="text-sm font-bold border-b-2 border-black pb-1 hover:text-yellow-500 hover:border-yellow-500 transition-colors">
+                  GO TO DASHBOARD
+                </Link>
+              )}
             </div>
           </div>
         )}
-
-        
-
       </main>
     </div>
   );

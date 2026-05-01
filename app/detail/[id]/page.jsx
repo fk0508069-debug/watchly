@@ -1,122 +1,224 @@
-'use client'
+'use client';
 
-import React, { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import Link from 'next/link'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
-function Details() {
-  const params = useParams()
-  const router = useRouter()
-  const cardId = params.id
-  
-  const [card, setCard] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+export default function ProductDetail() {
+  const params = useParams();
+  const { id } = params;
 
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Check authentication
   useEffect(() => {
-    const fetchCard = async () => {
+    const checkAuth = async () => {
       try {
-        const response = await fetch(`/api/cards?id=${cardId}`)
-        if (!response.ok) throw new Error('Card not found')
-        const data = await response.json()
-        setCard(data)
-      } catch (err) {
-        setError(err.message)
+        const res = await fetch('/api/user/me');
+        setIsAuthenticated(res.ok);
+      } catch (error) {
+        setIsAuthenticated(false);
       } finally {
-        setLoading(false)
+        setCheckingAuth(false);
       }
-    }
-    if (cardId) fetchCard()
-  }, [cardId])
+    };
 
-  if (loading) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>
-  )
+    checkAuth();
+  }, []);
 
-  if (error || !card) return (
-    <div className="p-10 text-center">
-      <h2 className="text-2xl font-semibold text-gray-800">Oops! {error || "Card not found"}</h2>
-      <button onClick={() => router.back()} className="mt-4 text-blue-500 hover:underline">Go Back</button>
-    </div>
-  )
+  // Fetch product
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`/api/cards?id=${id}`);
+        if (!response.ok) throw new Error('Product not found');
+        const data = await response.json();
+        setProduct(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Navigation Breadcrumb */}
-        <button 
-          onClick={() => router.back()}
-          className="mb-6 flex items-center text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors"
-        >
-          &larr; Back to Collection
-        </button>
+    if (id) fetchProduct();
+  }, [id]);
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="grid md:grid-cols-2 gap-0">
-            
-            {/* Left: Image Section */}
-            <div className="relative h-[400px] md:h-auto bg-gray-100">
-              <img
-                src={card.image}
-                alt={card.name}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
-            </div>
-
-            {/* Right: Content Section */}
-            <div className="p-8 md:p-12 flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 uppercase tracking-wider">
-                    {card.category}
-                  </span>
-                  <span className="text-2xl font-bold text-gray-900">${card.price}</span>
-                </div>
-
-                <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-                  {card.name}
-                </h1>
-                
-                <p className="text-gray-600 leading-relaxed mb-8 text-lg">
-                  {card.description}
-                </p>
-
-                {/* Seller Info Card */}
-                {card.createdBy && (
-                  <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-8">
-                    <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">
-                      {card.createdBy.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400 uppercase font-semibold tracking-tighter">Listed by</p>
-                      <p className="text-sm font-bold text-gray-800">{card.createdBy.name}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                <Link 
-                  href={`/checkout/${cardId}`} 
-                  className="block w-full text-center bg-gray-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition-all active:scale-[0.98] shadow-lg shadow-gray-200"
-                >
-                  Buy Now
-                </Link>
-                
-                {card.createdAt && (
-                  <p className="text-center text-xs text-gray-400">
-                    Published on {new Date(card.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
+  if (loading || checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-black mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading product...</p>
         </div>
       </div>
-    </div>
-  )
-}
+    );
+  }
 
-export default Details
+  // Show login prompt if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">Store</h1>
+            <Link href="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+              Login
+            </Link>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex items-center justify-center min-h-[600px]">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Login Required</h2>
+            <p className="text-gray-600 mb-8 max-w-md">
+              You need to log in to view product details and make purchases.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link 
+                href="/login"
+                className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+              >
+                Go to Login
+              </Link>
+              <Link 
+                href="/"
+                className="border-2 border-gray-300 text-gray-900 px-8 py-3 rounded-lg font-bold hover:border-gray-400 transition"
+              >
+                Back to Store
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <header className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">Store</h1>
+            <Link href="/login" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+              Login
+            </Link>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex items-center justify-center min-h-[600px]">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Product not found</h2>
+            <p className="text-gray-600 mb-6">{error || 'The product you are looking for does not exist.'}</p>
+            <Link 
+              href="/"
+              className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition"
+            >
+              Back to Store
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">Store</h1>
+          <Link href="/home" className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition">
+            ← Back to x Products
+          </Link>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Product Detail */}
+        <div className="grid md:grid-cols-2 gap-12">
+          {/* Product Image */}
+          <div className="flex items-center justify-center bg-white rounded-lg border border-gray-200 p-8 min-h-[500px]">
+            <img 
+              src={product.image} 
+              alt={product.name}
+              className="w-full h-full object-cover rounded-lg"
+            />
+          </div>
+
+          {/* Product Information */}
+          <div className="space-y-6">
+            {/* Category */}
+            <p className="text-sm text-gray-500 uppercase tracking-wider font-semibold">
+              {product.category}
+            </p>
+
+            {/* Name */}
+            <h1 className="text-4xl font-bold text-gray-900">
+              {product.name}
+            </h1>
+
+            {/* Price */}
+            <div className="space-y-2">
+              <p className="text-gray-600">Price</p>
+              <p className="text-5xl font-bold text-gray-900">
+                ${product.price}
+              </p>
+            </div>
+
+            {/* Description */}
+            {product.description && (
+              <div className="space-y-2 py-6 border-y border-gray-200">
+                <p className="text-gray-600">Description</p>
+                <p className="text-gray-900 leading-relaxed">
+                  {product.description}
+                </p>
+              </div>
+            )}
+
+            {/* Stock Status */}
+            <div className="space-y-2">
+              <p className="text-gray-600">Availability</p>
+              <p className="text-lg font-semibold text-green-600">
+                In Stock
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex gap-4 pt-6">
+              <Link 
+                href={`/checkout/${product._id}`}
+                className="flex-1 bg-black text-white py-4 rounded-lg font-bold text-lg hover:bg-gray-800 transition text-center"
+              >
+                Buy Now
+              </Link>
+              <Link 
+                href="/"
+                className="flex-1 border-2 border-gray-300 text-gray-900 py-4 rounded-lg font-bold text-lg hover:border-gray-400 transition text-center"
+              >
+                Continue Shopping
+              </Link>
+            </div>
+
+            {/* Additional Info */}
+            {product.createdAt && (
+              <p className="text-xs text-gray-500">
+                Added on {new Date(product.createdAt).toLocaleDateString(undefined, { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </p>
+            )}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

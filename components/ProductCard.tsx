@@ -1,21 +1,66 @@
-import { ObjectId } from "mongodb";
-import Image from "next/image";
+// import { ObjectId } from "mongodb";
+// import { User } from "next-auth";
+// import Image from "next/image";
 import Link from "next/link";
+import  { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCart } from "@/context/CartContext";
 interface ProductProps {
   id: string;
   name: string;
   price: number;
   image: string;
+
   category: string;
 }
-
+interface User {
+ 
+ 
+  role: string;
+ 
+}
 export default function ProductCard({ id, name, price, image, category }: ProductProps) {
+  
+   const [user, setUser] = useState<User | null>(null);
+   
+    const [loading, setLoading] = useState(true);
+   
+    const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+    const { add } = useCart();
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/api/user/me');
+        if (!res.ok) {
+          if (res.status === 401) {
+            router.push('/login');
+            return;
+          }
+          throw new Error('Failed to fetch user data');
+        }
+        const data = await res.json();
+        setUser(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [router]);
+
+function handleAddToCart() {
+  add({ id, name, price, image });
+}
+
   return (
     <>
     
     <div className=" group relative flex flex-col  overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
       {/* <Link href={`detail/${product.id}`}>hello</Link> */}
-    <Link href={`/detail/${id}`} className="relative inline-block">
+    <Link href={`/product/${id}`} className="relative inline-block">
       {/* Product Image */}
       <div className="aspect-square overflow-hidden bg-gray-100">
         
@@ -27,41 +72,47 @@ export default function ProductCard({ id, name, price, image, category }: Produc
       </div>
 
       {/* Product Details */}
-      <div className="flex flex-1 flex-col space-y-2 p-4">
+      <div className="flex flex-1 flex-col space-y-1 sm:space-y-2 p-3 sm:p-4">
         <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
           {category}
         </span>
-        
-        <h3 className="text-lg font-semibold text-gray-800">
+
+        <h3 className="text-sm sm:text-lg font-semibold text-gray-800 line-clamp-2">
             <span aria-hidden="true" className="absolute inset-0" />
             {name}
         </h3>
 
         <div className="flex items-center justify-between mt-auto">
-          <p className="text-xl font-bold text-gray-900">${price.toFixed(2)}</p>
-          
+          <p className="text-lg sm:text-xl font-bold text-gray-900">Rs. {price.toFixed(2)}</p>
+
         </div>
       </div>
-                </Link>
-          <button className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white transition-colors hover:bg-blue-700">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="h-5 w-5"
-              >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-                />
-            </svg>
-            
-          </button>
+                      </Link>
+                
+                {user?.role === 'admin' && (
+                  <div className="p-3 sm:p-4 border-t border-gray-200">
+                  <Link
+                    href={`/edit/${id}`}
+                    className="block w-full text-center bg-blue-500 text-white px-3 sm:px-4 py-2 rounded-md font-medium hover:bg-blue-600 transition-all text-sm sm:text-base"
+                  >
+                    Edit
+                  </Link>
+
+                </div>
+                )}
+                  <div className="p-3 sm:p-4 border-t border-gray-200">
+                    <button onClick={handleAddToCart} className="block w-full text-center bg-yellow-500 text-white px-3 sm:px-4 py-2 rounded-md font-medium hover:bg-yellow-600 transition-all text-sm sm:text-base">
+                      Add to Cart
+                    </button>
+                  </div>
+
+               
+               
     </div>
-          </>
+    </>
+  
+        
+    
           
   );
 }
