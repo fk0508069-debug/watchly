@@ -22,8 +22,7 @@ export default function ProductDetail() {
     price: '',
     category: '',
     image: '',
-    description: '',
-    stockStatus: 'available'
+    description: ''
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
@@ -61,8 +60,7 @@ export default function ProductDetail() {
           price: data.price ? data.price.toString() : '',
           category: data.category || '',
           image: data.image || '',
-          description: data.description || '',
-          stockStatus: 'available' // Default, since stock isn't in model
+          description: data.description || ''
         });
       } catch (err) {
         setError(err.message);
@@ -410,21 +408,6 @@ export default function ProductDetail() {
                 <div className="flex-1 border-t border-gray-300"></div>
               </div>
 
-              {/* Image URL */}
-              {/* <div>
-                <label className="block text-sm text-gray-600 mb-2">
-                  Image URL
-                </label>
-                <input 
-                  type="url" 
-                  name="image"
-                  value={formData.image} 
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., https://via.placeholder.com/300"
-                />
-              </div> */}
-
               {/* Image Preview */}
               {(imagePreview || formData.image || product?.image) && (
                 <div className="mt-4">
@@ -437,40 +420,6 @@ export default function ProductDetail() {
                 </div>
               )}
             </div>
-
-            {/* Stock Status */}
-     <div className="space-y-2">
-  <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-    Inventory Status
-  </label>
-  
-  <div className="relative w-full max-w-[200px]">
-    <select 
-      name="stockStatus"
-      value={formData.stockStatus}
-      onChange={handleChange}
-      className={`block w-full appearance-none rounded-lg border-0 py-2.5 pl-4 pr-10 font-bold shadow-sm ring-1 ring-inset transition-all focus:ring-2 focus:ring-offset-1 
-        ${formData.stockStatus === 'available' 
-          ? 'bg-green-50 text-green-700 ring-green-200 focus:ring-green-500' 
-          : 'bg-red-50 text-red-700 ring-red-200 focus:ring-red-500'
-        }`}
-    >
-      <option value="available" className="bg-white text-gray-900 font-medium">
-        🟢 Available
-      </option>
-      <option value="unavailable" className="bg-white text-gray-900 font-medium">
-        🔴 Not Available
-      </option>
-    </select>
-
-    {/* Custom Arrow Icon */}
-    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-      <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clipRule="evenodd" />
-      </svg>
-    </div>
-  </div>
-</div>
 
             {/* CTA Buttons */}
             <div className="flex gap-4 pt-6">

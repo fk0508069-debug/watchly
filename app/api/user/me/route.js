@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 export async function GET(req) {
   try {
     // Get token from cookies
-    const token = req.cookies.get("token")?.value;
+    const token = req.cookies.get("login token")?.value;
 
     if (!token) {
       return NextResponse.json(
@@ -18,7 +18,7 @@ export async function GET(req) {
     // Verify token
     let decoded;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key");
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
       return NextResponse.json(
         { message: "Unauthorized - Invalid token" },

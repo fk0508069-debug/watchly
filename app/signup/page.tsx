@@ -52,6 +52,9 @@ export default function SignupPage() {
       setLoading(false);
     }
   };
+  const handleGoogleLogin = () => {
+     signIn('google');
+   };
 
 
 
@@ -130,6 +133,13 @@ export default function SignupPage() {
           <span className="h-px flex-1 bg-slate-200" />
         </div>
 
+  <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full py-3 font-bold text-white rounded-lg transition-colors text-sm sm:text-base bg-red-600 hover:bg-red-700"
+        >
+          Sign up with Google
+        </button>
      
 
         <p className="text-center text-sm text-slate-600 pt-2">

@@ -1,13 +1,16 @@
 "use client";
+import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { UserCircle } from 'lucide-react';
-import Link from "next/link";
-export default function Navbar({ onCartOpen }) {
-  const { count } = useCart();
+// import Chatbot from '@/components/chatbot';
 
-  function handleCartClick() {
-    alert('Cart clicked!');
-  }
+import Link from "next/link";
+export default function Navbar({ onCartOpen , onSupportOpen}) {
+  const { count } = useCart();
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [supportLevel, setSupportLevel] = useState(50);
+
+  const handleSupportClose = () => setSupportOpen(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-30 border-b border-white/8">
@@ -21,7 +24,6 @@ export default function Navbar({ onCartOpen }) {
         </Link>
       </div>
 
-        {/* Nav links */}
       
 
         {/* Actions */}
@@ -57,8 +59,11 @@ export default function Navbar({ onCartOpen }) {
                 <UserCircle className="h-5 w-5 sm:h-6 sm:w-6 text-cream/70 hover:text-cream transition-colors" />
                 <span className="sr-only">Profile</span>
               </Link>
+          
         </div>
       </nav>
+
+     
     </header>
   );
 }

@@ -41,9 +41,9 @@ export default function LoginPage() {
     }
   };
 
-  // const handleGoogleLogin = () => {
-  //   signIn('google');
-  // };
+  const handleGoogleLogin = () => {
+    signIn('google');
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
@@ -96,7 +96,13 @@ export default function LoginPage() {
           <span className="h-px flex-1 bg-gray-200" />
         </div>
 
-      
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full py-3 font-bold text-white rounded-lg transition-colors text-sm sm:text-base bg-red-600 hover:bg-red-700"
+        >
+          Sign in with Google
+        </button>
 
         <p className="text-sm text-center text-gray-500">
           New here? <Link href="/signup" className="text-blue-600 hover:underline">Create an account</Link>

@@ -24,13 +24,13 @@ export async function POST(req) {
     // 3. Create JWT token
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      process.env.JWT_SECRET || "your-secret-key",
+      process.env.JWT_SECRET || '',
       { expiresIn: "7d" }
     );
 
     // 4. Set token in cookie
     const response = NextResponse.json({ message: "Login successful", userId: user._id }, { status: 200 });
-    response.cookies.set("token", token, {
+    response.cookies.set("login token", token, {
       httpOnly: true,
       secure: false,
       sameSite: "lax",

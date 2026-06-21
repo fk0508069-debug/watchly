@@ -88,6 +88,7 @@ export default function CartSidebar({ open, onClose }) {
                     >
                       +
                     </button>
+
                     <Link
                 key={item.id}
                 href={`/checkout/${item.id}`}
@@ -95,6 +96,14 @@ export default function CartSidebar({ open, onClose }) {
                   hover:bg-amber-300 transition-colors duration-200 rounded"
               >
                 Checkout
+              </Link>
+                  <Link
+              
+                href={`/product/${item.id}`}
+                className=" py-1.5 m-2 p-2 bg-blue-400 text-ink font-semibold text-sm tracking-[0.15em] uppercase
+                  hover:bg-blue-300 transition-colors duration-200 rounded"
+              >
+                VIEW
               </Link>
                   </div>
                 </div>

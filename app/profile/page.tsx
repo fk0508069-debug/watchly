@@ -110,6 +110,7 @@ export default function Profile() {
                   GO TO DASHBOARD
                 </Link>
               )}
+            
             </div>
           </div>
         )}

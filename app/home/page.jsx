@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 import ProductCard from "@/components/ProductCard"; 
 import CartSidebar from "@/components/CartSidebar";
+import Chatbot from "@/components/chatbot";
 import Link from "next/link";
 export default function Home() {
   const router = useRouter();
@@ -16,6 +17,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [cartOpen, setCartOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [supportLevel, setSupportLevel] = useState(50);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -85,12 +88,13 @@ export default function Home() {
 
       <CartSidebar open={cartOpen} onClose={() => setCartOpen(false)} />
 
+      <Chatbot open={supportOpen} onClose={() => setSupportOpen(false)} supportLevel={supportLevel} setSupportLevel={setSupportLevel} />
       <main className="max-w-7xl m-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
         {/* Header Section */}
 
-<h1>.</h1>        
-<h1>.</h1>        
-        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
+
+      
+        <div className="mb-6 sm:mb-8 m-12 space-y-4 sm:space-y-5 ">
           <div className="relative">
             <input
               type="text"

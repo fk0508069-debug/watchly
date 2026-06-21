@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "app/signup", "app/add-card/page.jsx", "app/detail/[id]/page.jsx", "app/checkout/[id]/page.jsx", "app/page.jsx", "components/myorders.jsx"  ],
+, "app/signup", "app/add-card/page.jsx", "app/detail/[id]/page.jsx", "app/checkout/[id]/page.jsx", "app/page.jsx", "components/myorders.jsx", "app/product/[id]/page.jsx"  ],
   "exclude": ["node_modules"]
 }
